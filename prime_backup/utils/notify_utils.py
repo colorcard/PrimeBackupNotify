@@ -54,41 +54,92 @@ def _get_server_running() -> Optional[bool]:
 		return None
 
 
-def _get_translation(config: Config, key: str) -> str:
+def _get_translation(notification_config, key: str) -> str:
 	"""
 	Get translated text from language file.
 	Fallback to English if translation not found.
+	Uses MCDR's open_bundled_file() for packed plugins.
 	"""
-	language = config.notification.language if hasattr(config, 'notification') else 'en_us'
+	# 获取语言设置，使用 getattr 避免属性访问错误
+	try:
+		language = getattr(notification_config, 'language', 'en_us')
+	except AttributeError:
+		language = 'en_us'
+	
+	log = logger.get()
+	data = None
+	
 	try:
 		from ruamel.yaml import YAML
-		import os
-		from pathlib import Path
+		yaml = YAML()
 		
-		# Get lang file path
-		plugin_dir = Path(__file__).parent.parent.parent
-		lang_file = plugin_dir / 'lang' / f'{language}.yml'
+		# 尝试使用 MCDR 的 open_bundled_file() API（适用于打包插件）
+		try:
+			from prime_backup.mcdr import mcdr_globals
+			if mcdr_globals.server is not None:
+				log.debug(f'Attempting to load translation using MCDR API, language={language}')
+				# 尝试读取指定语言文件
+				lang_file_path = f'lang/{language}.yml'
+				try:
+					# open_bundled_file() 返回二进制流，需要解码
+					with mcdr_globals.server.open_bundled_file(lang_file_path) as f:
+						content = f.read().decode('utf-8')
+						from io import StringIO
+						data = yaml.load(StringIO(content))
+					log.debug(f'Successfully loaded translation from bundled file: {lang_file_path}')
+				except (FileNotFoundError, KeyError) as e:
+					# 如果指定语言不存在，尝试英文
+					log.debug(f'Language file not found: {lang_file_path} ({e}), falling back to en_us')
+					if language != 'en_us':
+						try:
+							with mcdr_globals.server.open_bundled_file('lang/en_us.yml') as f:
+								content = f.read().decode('utf-8')
+								from io import StringIO
+								data = yaml.load(StringIO(content))
+							log.debug('Successfully loaded translation from bundled file: lang/en_us.yml')
+						except (FileNotFoundError, KeyError) as e2:
+							log.debug(f'Fallback to en_us also failed: {e2}')
+			else:
+				log.debug('mcdr_globals.server is None, skipping MCDR API')
+		except Exception as e:
+			log.debug(f'Failed to use MCDR API for bundled file: {e}', exc_info=True)
 		
-		if not lang_file.exists() and language != 'en_us':
-			# Fallback to English
-			lang_file = plugin_dir / 'lang' / 'en_us.yml'
-		
-		if lang_file.exists():
-			yaml = YAML()
+		# 如果 MCDR API 失败，回退到文件路径方式（开发环境）
+		if data is None:
+			log.debug('Falling back to file path method for loading translation')
+			from pathlib import Path
+			plugin_dir = Path(__file__).parent.parent.parent
+			lang_file = plugin_dir / 'lang' / f'{language}.yml'
+			
+			if not lang_file.exists():
+				if language != 'en_us':
+					log.debug(f'Language file not found: {lang_file}, falling back to en_us')
+					lang_file = plugin_dir / 'lang' / 'en_us.yml'
+			
+			if not lang_file.exists():
+				log.warning(f'No language file found at {lang_file}')
+				return key
+			
 			with open(lang_file, 'r', encoding='utf-8') as f:
 				data = yaml.load(f)
-			
-			# Navigate to the key
+			log.debug(f'Loaded translation from file path: {lang_file}')
+		
+		# Navigate to the key
+		if data is not None:
 			keys = key.split('.')
 			value = data
-			for k in keys:
+			for i, k in enumerate(keys):
 				if isinstance(value, dict) and k in value:
 					value = value[k]
 				else:
+					log.debug(f'Translation key not found: {key} (stopped at {".".join(keys[:i+1])})')
 					return key  # Key not found, return the key itself
-			return str(value)
+			
+			result = str(value)
+			log.debug(f'Translation found for {key}: {result}')
+			return result
 	except Exception as e:
-		logger.get().warning(f'Failed to get translation for {key}: {e}')
+		log.warning(f'Failed to get translation for {key}: {e}', exc_info=True)
 	return key
 
 
@@ -148,7 +199,7 @@ def _make_payload(
 		message: Optional[str],
 		error: Optional[Exception],
 		extra: Optional[Dict[str, Any]],
-		config: Config,
+		notification_config,  # NotificationConfig type
 ) -> Dict[str, Any]:
 	now = time.time()
 	version = str(_get_plugin_version())
@@ -188,7 +239,7 @@ def _make_payload(
 		payload['extra'] = extra
 
 	# Localized title
-	title_template = _get_translation(config, 'prime_backup.notification.content.title')
+	title_template = _get_translation(notification_config, 'prime_backup.notification.content.title')
 	title = title_template.format(event.task, event.status)
 	body_parts = [f'event={event.value}']
 	if backup is not None:
@@ -255,7 +306,7 @@ def _apply_if_not_none(data: Dict[str, Any], key: str, value: Any):
 		data[key] = value
 
 
-def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool, config: Config) -> str:
+def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool, notification_config) -> str:
 	backup = base_payload.get('backup') or {}
 	operator = base_payload.get('operator') or {}
 	source = base_payload.get('source') or {}
@@ -270,7 +321,7 @@ def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool, config: C
 
 	# Get localized field names
 	def get_field_name(key: str) -> str:
-		return _get_translation(config, f'prime_backup.notification.content.fields.{key}')
+		return _get_translation(notification_config, f'prime_backup.notification.content.fields.{key}')
 
 	fields = [
 		(get_field_name('event'), base_payload.get('event')),
@@ -310,10 +361,10 @@ def _resolve_bark_url(endpoint) -> str:
 	return url
 
 
-def _make_bark_payload(base_payload: Dict[str, Any], endpoint, config: Config) -> Dict[str, Any]:
+def _make_bark_payload(base_payload: Dict[str, Any], endpoint, notification_config) -> Dict[str, Any]:
 	bark = endpoint.bark
 	markdown = bool(bark.markdown)
-	default_body = _format_bark_body(base_payload, markdown=markdown, config=config)
+	default_body = _format_bark_body(base_payload, markdown=markdown, notification_config=notification_config)
 	title = bark.title or base_payload.get('title')
 	body = bark.body or default_body
 
@@ -361,7 +412,7 @@ def _make_bark_payload(base_payload: Dict[str, Any], endpoint, config: Config) -
 	return data
 
 
-def _send_to_endpoint(endpoint, payload: Dict[str, Any], config: Config) -> Tuple[str, bool, Optional[str], float]:
+def _send_to_endpoint(endpoint, payload: Dict[str, Any], notification_config) -> Tuple[str, bool, Optional[str], float]:
 	"""Send notification to a single endpoint with retry
 	
 	Returns:
@@ -380,7 +431,7 @@ def _send_to_endpoint(endpoint, payload: Dict[str, Any], config: Config) -> Tupl
 	try:
 		if endpoint.type == 'bark':
 			bark_url = _resolve_bark_url(endpoint)
-			bark_payload = _make_bark_payload(payload, endpoint, config)
+			bark_payload = _make_bark_payload(payload, endpoint, notification_config)
 			success, error_msg = _post_json_with_retry(
 				bark_url, bark_payload, endpoint.headers, 
 				endpoint.timeout.value, endpoint.retry_times
@@ -454,7 +505,7 @@ def notify_with_results(
 		message=message,
 		error=error,
 		extra=extra,
-		config=config,
+		notification_config=config,
 	)
 
 	# Send notifications concurrently to all enabled endpoints

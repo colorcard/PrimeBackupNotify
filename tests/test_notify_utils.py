@@ -28,7 +28,7 @@ class NotifyUtilsTestCase(unittest.TestCase):
 				message=None,
 				error=None,
 				extra=None,
-				config=config,
+				notification_config=config.notification,
 			)
 			self.assertEqual('1.2.3', payload['plugin']['version'])
 			json.dumps(payload, ensure_ascii=False)
