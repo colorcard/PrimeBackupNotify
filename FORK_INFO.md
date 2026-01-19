@@ -42,7 +42,8 @@
 
 ### 技术变更 / Technical Changes
 
-- 插件 ID: `prime_backup` → `prime_backup_notify`
+- 插件 ID: `prime_backup` (保持不变以兼容 MCDR 包名规范 / kept same for MCDR package naming compatibility)
+- 插件名称: `Prime Backup Notify`
 - 包名保持不变以便于维护: `prime_backup` (unchanged for maintenance)
 - 新增配置项: `notification` (root config)
 - 新增权限项: `command.permission.test` (default: 4)
@@ -67,9 +68,19 @@ This project inherits the **LGPL v3** license from the original project.
 
 ## 兼容性说明 / Compatibility
 
-⚠️ **重要**: 由于插件 ID 已更改（`prime_backup_notify`），本 fork 版本与原版 Prime Backup **不兼容**，不能同时安装。
+⚠️ **重要**: 本 fork 版本的插件名称为 **Prime Backup Notify**，但为了兼容 MCDR 的包名规范，插件 ID 保持为 `prime_backup`。
 
-⚠️ **Important**: Due to the plugin ID change (`prime_backup_notify`), this fork is **incompatible** with the original Prime Backup and cannot be installed simultaneously.
+⚠️ **Important**: This fork is named **Prime Backup Notify**, but to comply with MCDR package naming conventions, the plugin ID remains `prime_backup`.
+
+### 与原版的关系 / Relationship with Original
+
+- **不能同时安装**：本 fork 与原版 Prime Backup 使用相同的插件 ID (`prime_backup`)，因此不能同时安装。
+- **配置兼容**：配置文件路径相同 (`config/prime_backup/`)，数据库和备份文件可以直接使用。
+- **功能增强**：在原版基础上新增了通知功能，保持所有原有功能不变。
+
+- **Cannot coexist**: This fork and the original Prime Backup share the same plugin ID (`prime_backup`), so they cannot be installed simultaneously.
+- **Config compatible**: Config file path remains `config/prime_backup/`, database and backup files can be used directly.
+- **Feature enhancement**: Adds notification features on top of the original, keeping all existing features intact.
 
 ### 从原版迁移 / Migration from Original
 
@@ -77,11 +88,12 @@ This project inherits the **LGPL v3** license from the original project.
 
 If you want to migrate from the original Prime Backup to this fork:
 
-1. 备份你的数据 / Backup your data
-2. 卸载原版 Prime Backup / Uninstall original Prime Backup
-3. 安装 Prime Backup Notify / Install Prime Backup Notify
-4. 数据库和备份文件可以直接使用（配置文件路径会变化）/ Database and backup files can be used directly (config file path will change)
-5. 配置文件路径变化：`config/prime_backup/` → `config/prime_backup_notify/`
+1. 停止服务器 / Stop the server
+2. 备份你的数据（可选但推荐）/ Backup your data (optional but recommended)
+3. 卸载原版 Prime Backup / Uninstall original Prime Backup
+4. 安装 Prime Backup Notify / Install Prime Backup Notify
+5. 配置文件路径相同，无需迁移 / Config path is the same, no migration needed
+6. 如需使用通知功能，在配置中添加 `notification` 部分 / To use notifications, add `notification` section to config
 
 ## 致谢 / Acknowledgments
 
