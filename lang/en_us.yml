@@ -22,6 +22,24 @@ prime_backup:
       endpoint_failed: '✗ {} - Failed: {}'
       summary: 'Summary: {}/{} endpoints succeeded, total time: {}'
 
+  notification:
+    content:
+      title: 'Prime Backup Notify {} {}'
+      fields:
+        event: Event
+        task: Task
+        status: Status
+        backup: Backup
+        date: Date
+        comment: Comment
+        creator: Creator
+        operator: Operator
+        source: Source
+        files: Files
+        cost: Cost
+        message: Message
+        error: Error
+
   task:
     _base:
       no_confirm: No choice has been made, task {} aborted

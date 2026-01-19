@@ -70,6 +70,7 @@ class NotificationEndpoint(Serializable):
 
 class NotificationConfig(Serializable):
 	enabled: bool = False
+	language: str = 'en_us'  # Notification content language: en_us, zh_cn
 	events: List[NotificationEvent] = [
 		NotificationEvent.backup_start,
 		NotificationEvent.backup_success,

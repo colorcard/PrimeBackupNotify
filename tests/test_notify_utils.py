@@ -14,6 +14,10 @@ class _DummyVersion:
 
 class NotifyUtilsTestCase(unittest.TestCase):
 	def test_make_payload_version_json_serializable(self):
+		from prime_backup.config.config import Config
+		config = Config()
+		config.notification = NotificationConfig()
+		
 		with patch('prime_backup.utils.notify_utils._get_plugin_version', return_value=_DummyVersion()):
 			payload = notify_utils._make_payload(
 				NotificationEvent.backup_start,
@@ -24,11 +28,16 @@ class NotifyUtilsTestCase(unittest.TestCase):
 				message=None,
 				error=None,
 				extra=None,
+				config=config,
 			)
 			self.assertEqual('1.2.3', payload['plugin']['version'])
 			json.dumps(payload, ensure_ascii=False)
 
 	def test_bark_payload_support(self):
+		from prime_backup.config.config import Config
+		config = Config()
+		config.notification = NotificationConfig()
+		
 		endpoint = NotificationEndpoint(
 			type='bark',
 			url='https://api.day.app/push',
@@ -47,7 +56,7 @@ class NotifyUtilsTestCase(unittest.TestCase):
 				'stored_size': 80,
 			},
 		}
-		bark_payload = notify_utils._make_bark_payload(base_payload, endpoint)
+		bark_payload = notify_utils._make_bark_payload(base_payload, endpoint, config)
 		self.assertIn('device_key', bark_payload)
 		self.assertIn('markdown', bark_payload)
 		self.assertNotIn('body', bark_payload)
@@ -65,6 +74,10 @@ class NotifyUtilsTestCase(unittest.TestCase):
 		self.assertEqual('https://api.day.app/xyz', url)
 
 	def test_bark_level_default_failure(self):
+		from prime_backup.config.config import Config
+		config = Config()
+		config.notification = NotificationConfig()
+		
 		endpoint = NotificationEndpoint(type='bark', url='https://api.day.app/{device_key}', bark=BarkOptions(device_key='xyz'))
 		base_payload = {
 			'title': 'Prime Backup Notify backup failure',
@@ -76,7 +89,7 @@ class NotifyUtilsTestCase(unittest.TestCase):
 				'message': 'boom',
 			},
 		}
-		bark_payload = notify_utils._make_bark_payload(base_payload, endpoint)
+		bark_payload = notify_utils._make_bark_payload(base_payload, endpoint, config)
 		self.assertEqual('critical', bark_payload['level'])
 
 	def test_endpoint_url_validation(self):

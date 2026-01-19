@@ -784,6 +784,15 @@ Notification switch
 - Type: `bool`
 - Default: `false`
 
+#### language
+
+Language for notification content. Affects notification title and Bark formatted field names
+
+Available values: `en_us` (English), `zh_cn` (Chinese)
+
+- Type: `str`
+- Default: `"en_us"`
+
 #### events
 
 Event types to notify

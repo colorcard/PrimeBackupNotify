@@ -784,6 +784,15 @@ Prime Backup 所使用的 SQLite 数据库的相关配置
 - 类型：`bool`
 - 默认值：`false`
 
+#### language
+
+通知内容的语言。影响通知标题和 Bark 格式化字段名的显示语言
+
+可用值：`en_us`（英文）、`zh_cn`（中文）
+
+- 类型：`str`
+- 默认值：`"en_us"`
+
 #### events
 
 需要触发通知的事件类型列表

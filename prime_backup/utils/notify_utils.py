@@ -54,6 +54,44 @@ def _get_server_running() -> Optional[bool]:
 		return None
 
 
+def _get_translation(config: Config, key: str) -> str:
+	"""
+	Get translated text from language file.
+	Fallback to English if translation not found.
+	"""
+	language = config.notification.language if hasattr(config, 'notification') else 'en_us'
+	try:
+		from ruamel.yaml import YAML
+		import os
+		from pathlib import Path
+		
+		# Get lang file path
+		plugin_dir = Path(__file__).parent.parent.parent
+		lang_file = plugin_dir / 'lang' / f'{language}.yml'
+		
+		if not lang_file.exists() and language != 'en_us':
+			# Fallback to English
+			lang_file = plugin_dir / 'lang' / 'en_us.yml'
+		
+		if lang_file.exists():
+			yaml = YAML()
+			with open(lang_file, 'r', encoding='utf-8') as f:
+				data = yaml.load(f)
+			
+			# Navigate to the key
+			keys = key.split('.')
+			value = data
+			for k in keys:
+				if isinstance(value, dict) and k in value:
+					value = value[k]
+				else:
+					return key  # Key not found, return the key itself
+			return str(value)
+	except Exception as e:
+		logger.get().warning(f'Failed to get translation for {key}: {e}')
+	return key
+
+
 def _get_source_info(source: Optional[Any]) -> Optional[Dict[str, Any]]:
 	if source is None:
 		return None
@@ -110,6 +148,7 @@ def _make_payload(
 		message: Optional[str],
 		error: Optional[Exception],
 		extra: Optional[Dict[str, Any]],
+		config: Config,
 ) -> Dict[str, Any]:
 	now = time.time()
 	version = str(_get_plugin_version())
@@ -148,7 +187,9 @@ def _make_payload(
 	if extra is not None:
 		payload['extra'] = extra
 
-	title = f'Prime Backup Notify {event.task} {event.status}'
+	# Localized title
+	title_template = _get_translation(config, 'prime_backup.notification.content.title')
+	title = title_template.format(event.task, event.status)
 	body_parts = [f'event={event.value}']
 	if backup is not None:
 		body_parts.append(f'backup=#{backup.id}')
@@ -214,7 +255,7 @@ def _apply_if_not_none(data: Dict[str, Any], key: str, value: Any):
 		data[key] = value
 
 
-def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool) -> str:
+def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool, config: Config) -> str:
 	backup = base_payload.get('backup') or {}
 	operator = base_payload.get('operator') or {}
 	source = base_payload.get('source') or {}
@@ -227,23 +268,27 @@ def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool) -> str:
 		src_name = source.get('name') or ''
 		return f'{src_type}:{src_name}' if len(src_name) > 0 else src_type
 
+	# Get localized field names
+	def get_field_name(key: str) -> str:
+		return _get_translation(config, f'prime_backup.notification.content.fields.{key}')
+
 	fields = [
-		('Event', base_payload.get('event')),
-		('Task', base_payload.get('task')),
-		('Status', base_payload.get('status')),
-		('Backup', f"#{backup.get('id')}" if backup.get('id') is not None else None),
-		('Date', backup.get('date')),
-		('Comment', backup.get('comment')),
-		('Creator', backup.get('creator')),
-		('Operator', operator.get('full')),
-		('Source', format_source()),
-		('Files', (
+		(get_field_name('event'), base_payload.get('event')),
+		(get_field_name('task'), base_payload.get('task')),
+		(get_field_name('status'), base_payload.get('status')),
+		(get_field_name('backup'), f"#{backup.get('id')}" if backup.get('id') is not None else None),
+		(get_field_name('date'), backup.get('date')),
+		(get_field_name('comment'), backup.get('comment')),
+		(get_field_name('creator'), backup.get('creator')),
+		(get_field_name('operator'), operator.get('full')),
+		(get_field_name('source'), format_source()),
+		(get_field_name('files'), (
 			f"{backup.get('file_count')} files, raw={backup.get('raw_size')}, stored={backup.get('stored_size')}"
 			if backup.get('file_count') is not None else None
 		)),
-		('Cost', f"{base_payload.get('cost_s')}s" if base_payload.get('cost_s') is not None else None),
-		('Message', base_payload.get('message')),
-		('Error', (
+		(get_field_name('cost'), f"{base_payload.get('cost_s')}s" if base_payload.get('cost_s') is not None else None),
+		(get_field_name('message'), base_payload.get('message')),
+		(get_field_name('error'), (
 			f"{error.get('type')}: {error.get('message')}"
 			if error.get('type') or error.get('message') else None
 		)),
@@ -265,10 +310,10 @@ def _resolve_bark_url(endpoint) -> str:
 	return url
 
 
-def _make_bark_payload(base_payload: Dict[str, Any], endpoint) -> Dict[str, Any]:
+def _make_bark_payload(base_payload: Dict[str, Any], endpoint, config: Config) -> Dict[str, Any]:
 	bark = endpoint.bark
 	markdown = bool(bark.markdown)
-	default_body = _format_bark_body(base_payload, markdown=markdown)
+	default_body = _format_bark_body(base_payload, markdown=markdown, config=config)
 	title = bark.title or base_payload.get('title')
 	body = bark.body or default_body
 
@@ -316,7 +361,7 @@ def _make_bark_payload(base_payload: Dict[str, Any], endpoint) -> Dict[str, Any]
 	return data
 
 
-def _send_to_endpoint(endpoint, payload: Dict[str, Any]) -> Tuple[str, bool, Optional[str], float]:
+def _send_to_endpoint(endpoint, payload: Dict[str, Any], config: Config) -> Tuple[str, bool, Optional[str], float]:
 	"""Send notification to a single endpoint with retry
 	
 	Returns:
@@ -335,7 +380,7 @@ def _send_to_endpoint(endpoint, payload: Dict[str, Any]) -> Tuple[str, bool, Opt
 	try:
 		if endpoint.type == 'bark':
 			bark_url = _resolve_bark_url(endpoint)
-			bark_payload = _make_bark_payload(payload, endpoint)
+			bark_payload = _make_bark_payload(payload, endpoint, config)
 			success, error_msg = _post_json_with_retry(
 				bark_url, bark_payload, endpoint.headers, 
 				endpoint.timeout.value, endpoint.retry_times
@@ -409,6 +454,7 @@ def notify_with_results(
 		message=message,
 		error=error,
 		extra=extra,
+		config=config,
 	)
 
 	# Send notifications concurrently to all enabled endpoints
@@ -422,7 +468,7 @@ def notify_with_results(
 	with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='notify') as executor:
 		# Submit all tasks
 		future_to_endpoint = {
-			executor.submit(_send_to_endpoint, endpoint, payload): endpoint
+			executor.submit(_send_to_endpoint, endpoint, payload, config): endpoint
 			for endpoint in enabled_endpoints
 		}
 		

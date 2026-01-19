@@ -22,6 +22,24 @@ prime_backup:
       endpoint_failed: '✗ {} - 失败: {}'
       summary: '总计: {}/{} 个端点成功, 总耗时: {}'
 
+  notification:
+    content:
+      title: 'Prime Backup 通知 {} {}'
+      fields:
+        event: 事件
+        task: 任务
+        status: 状态
+        backup: 备份
+        date: 日期
+        comment: 备注
+        creator: 创建者
+        operator: 操作者
+        source: 来源
+        files: 文件
+        cost: 耗时
+        message: 消息
+        error: 错误
+
   task:
     _base:
       no_confirm: 未做出选择, {}任务已终止
