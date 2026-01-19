@@ -16,5 +16,8 @@ __pycache__
 *.zip
 *.tar*
 
+prime-backup-notify-patch/
+
 # docs
 /site/
+.references/
