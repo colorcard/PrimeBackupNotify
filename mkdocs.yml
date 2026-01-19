@@ -1,11 +1,11 @@
 # https://www.mkdocs.org/
 site_name: Prime Backup Notify Documentation
 site_url: https://colorcard.github.io/PrimeBackupNotify/
-site_author: colorcard (Original: Fallen_Breath)
+site_author: "colorcard (Original: Fallen_Breath)"
 site_description: A powerful backup plugin for MCDR with task notification support
 repo_url: https://github.com/colorcard/PrimeBackupNotify
 repo_name: colorcard/PrimeBackupNotify
-copyright: Copyright &copy; 2025 Fallen_Breath (Original), colorcard
+copyright: "Copyright &copy; 2025 Fallen_Breath (Original), colorcard"
 exclude_docs: |-
   /requirements.txt
 
