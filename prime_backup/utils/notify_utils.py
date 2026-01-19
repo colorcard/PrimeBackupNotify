@@ -306,11 +306,79 @@ def _apply_if_not_none(data: Dict[str, Any], key: str, value: Any):
 		data[key] = value
 
 
+def _get_event_emoji(base_payload: Dict[str, Any]) -> str:
+	"""Return an emoji prefix based on task/status.
+
+	Keep this conservative (purely visual), so it won't affect routing/logic.
+	"""
+	task = str(base_payload.get('task') or '')
+	status = str(base_payload.get('status') or '')
+
+	if task == 'backup':
+		if status == 'start':
+			return '🧩'
+		if status == 'success':
+			return '✅'
+		if status == 'failure':
+			return '❌'
+		return '📦'
+
+	if task == 'restore':
+		if status == 'start':
+			return '🧭'
+		if status == 'success':
+			return '♻️'
+		if status == 'failure':
+			return '🔥'
+		return '🧰'
+
+	# Fallback
+	if status == 'success':
+		return '✅'
+	if status == 'failure':
+		return '❌'
+	if status == 'start':
+		return '🚀'
+	return '🔔'
+
+
+def _build_bark_copy_text(base_payload: Dict[str, Any]) -> str:
+	backup = base_payload.get('backup') or {}
+	backup_id = backup.get('id')
+	parts: List[str] = []
+	if base_payload.get('event'):
+		parts.append(f"event={base_payload.get('event')}")
+	if backup_id is not None:
+		parts.append(f"backup=#{backup_id}")
+	if base_payload.get('cost_s') is not None:
+		parts.append(f"cost={base_payload.get('cost_s')}s")
+	if base_payload.get('message'):
+		parts.append(f"message={base_payload.get('message')}")
+	return ', '.join(parts)
+
+
+def _default_bark_sound(base_payload: Dict[str, Any]) -> Optional[str]:
+	"""Pick a reasonable default sound name.
+
+	Bark accepts iOS sound names; if an unknown sound is used, Bark typically falls back.
+	Keep defaults subtle: only failure gets a loud-ish sound.
+	"""
+	status = str(base_payload.get('status') or '')
+	if status == 'failure':
+		return 'alarm'
+	if status == 'success':
+		return 'bell'
+	if status == 'start':
+		return 'glass'
+	return None
+
+
 def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool, notification_config) -> str:
 	backup = base_payload.get('backup') or {}
 	operator = base_payload.get('operator') or {}
 	source = base_payload.get('source') or {}
 	error = base_payload.get('error') or {}
+	emoji = _get_event_emoji(base_payload)
 
 	def format_source() -> Optional[str]:
 		src_type = source.get('type')
@@ -345,12 +413,79 @@ def _format_bark_body(base_payload: Dict[str, Any], *, markdown: bool, notificat
 		)),
 	]
 
+	def build_summary_line() -> str:
+		event = base_payload.get('event') or ''
+		backup_id = backup.get('id')
+		cost_s = base_payload.get('cost_s')
+		parts: List[str] = []
+		if event:
+			parts.append(str(event))
+		if backup_id is not None:
+			parts.append(f"#{backup_id}")
+		if cost_s is not None:
+			parts.append(f"⏱️ {cost_s}s")
+		message = base_payload.get('message')
+		if message:
+			parts.append(f"💬 {message}")
+		return '  '.join(parts).strip()
+
+	icon_map = {
+		'event': '🏷️',
+		'task': '🧰',
+		'status': '📌',
+		'backup': '🗃️',
+		'date': '📅',
+		'comment': '📝',
+		'creator': '🧑',
+		'operator': '👤',
+		'source': '🎮',
+		'files': '🗂️',
+		'cost': '⏱️',
+		'message': '💬',
+		'error': '🧨',
+	}
+
 	if markdown:
-		lines = [f"- **{k}**: {v}" for k, v in fields if v not in [None, '']]
-		return '\n'.join(lines)
+		header_lines: List[str] = []
+		summary = build_summary_line()
+		# Use a heading to improve readability in Bark markdown renderer
+		if summary:
+			header_lines.append(f"### {emoji} {summary}")
+		else:
+			header_lines.append(f"### {emoji} {base_payload.get('event') or ''}")
+		# Add a compact “stats line” when available
+		file_count = backup.get('file_count')
+		raw_size = backup.get('raw_size')
+		stored_size = backup.get('stored_size')
+		if file_count is not None or raw_size is not None or stored_size is not None:
+			stats_parts: List[str] = []
+			if file_count is not None:
+				stats_parts.append(f"🧾 {file_count} files")
+			if raw_size is not None:
+				stats_parts.append(f"📦 raw={raw_size}")
+			if stored_size is not None:
+				stats_parts.append(f"🗜️ stored={stored_size}")
+			header_lines.append(' '.join(stats_parts))
+		header_lines.append('---')
+		lines: List[str] = []
+		for (k, v), key in zip(fields, [
+			'event', 'task', 'status', 'backup', 'date', 'comment', 'creator', 'operator', 'source', 'files', 'cost', 'message', 'error'
+		]):
+			if v in [None, '']:
+				continue
+			icon = icon_map.get(key, '•')
+			lines.append(f"- {icon} **{k}**: {v}")
+		return '\n'.join(header_lines + lines)
 	else:
+		header_lines = []
+		summary = build_summary_line()
+		if summary:
+			header_lines.append(f"{emoji} {summary}")
+		else:
+			header_lines.append(f"{emoji} {base_payload.get('event') or ''}")
+		header_lines.append('----------------')
 		lines = [f"{k}: {v}" for k, v in fields if v not in [None, '']]
-		return '\n'.join(lines)
+		return '\n'.join(header_lines + lines)
 
 
 def _resolve_bark_url(endpoint) -> str:
@@ -364,8 +499,14 @@ def _resolve_bark_url(endpoint) -> str:
 def _make_bark_payload(base_payload: Dict[str, Any], endpoint, notification_config) -> Dict[str, Any]:
 	bark = endpoint.bark
 	markdown = bool(bark.markdown)
+	emoji = _get_event_emoji(base_payload)
 	default_body = _format_bark_body(base_payload, markdown=markdown, notification_config=notification_config)
 	title = bark.title or base_payload.get('title')
+	# Only decorate title when user didn't explicitly configure a custom title
+	if bark.title is None and title:
+		stripped = str(title).lstrip()
+		if not stripped.startswith(emoji):
+			title = f'{emoji} {title}'
 	body = bark.body or default_body
 
 	backup = base_payload.get('backup') or {}
@@ -395,8 +536,17 @@ def _make_bark_payload(base_payload: Dict[str, Any], endpoint, notification_conf
 	_apply_if_not_none(data, 'badge', bark.badge)
 	_apply_if_not_none(data, 'call', bark.call)
 	_apply_if_not_none(data, 'autoCopy', bark.autoCopy)
-	_apply_if_not_none(data, 'copy', bark.copy)
-	_apply_if_not_none(data, 'sound', bark.sound)
+	# Provide a useful default copy text (non-intrusive; user can override)
+	copy_text = bark.copy
+	if copy_text is None:
+		copy_text = _build_bark_copy_text(base_payload)
+	_apply_if_not_none(data, 'copy', copy_text)
+
+	# Default sound if user didn't specify
+	sound = bark.sound
+	if sound is None:
+		sound = _default_bark_sound(base_payload)
+	_apply_if_not_none(data, 'sound', sound)
 	_apply_if_not_none(data, 'icon', bark.icon)
 	_apply_if_not_none(data, 'image', bark.image)
 	_apply_if_not_none(data, 'group', bark.group or constants.PLUGIN_ID)

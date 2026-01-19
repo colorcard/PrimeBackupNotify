@@ -21,6 +21,9 @@ Document: https://colorcard.github.io/PrimeBackupNotify/
 - **Command-line Testing**: New `!!pb test notify` command for quick notification testing
 - **Complete Documentation**: Bilingual (EN/ZH) notification docs and config examples
 
+![pb_notify](docs/img/pb_notify1.jpg)
+![pb_notify](docs/img/pb_notify2.jpg)
+
 ## Original Features
 
 - Only stores files with changes with the hash-based file pool. Supports unlimited number of backup

@@ -21,6 +21,9 @@
 - **命令行测试**：新增 `!!pb test notify` 命令，可在服务器内快速测试通知配置
 - **完整文档**：提供中英文通知功能文档与配置说明
 
+![pb_notify](docs/img/pb_notify1.jpg)
+![pb_notify](docs/img/pb_notify2.jpg)
+
 ## 原版功能
 
 - 基于哈希的文件池，只储存有变化的文件。支持无限数量的备份

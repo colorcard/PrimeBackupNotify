@@ -62,7 +62,10 @@ class NotifyUtilsTestCase(unittest.TestCase):
 		self.assertNotIn('body', bark_payload)
 		self.assertEqual('pb', bark_payload['group'])
 		self.assertEqual('passive', bark_payload['level'])
+		# Rich markdown body should still contain core task/event information
 		self.assertIn('backup', bark_payload['markdown'])
+		self.assertIn('backup_success', bark_payload['markdown'])
+		self.assertIn('#1', bark_payload['markdown'])
 
 	def test_bark_url_placeholder(self):
 		endpoint = NotificationEndpoint(
