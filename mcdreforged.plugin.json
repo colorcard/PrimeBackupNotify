@@ -1,20 +1,21 @@
 {
-    "id": "prime_backup",
+    "id": "prime_backup_notify",
     "version": "1.12.0",
-    "name": "Prime Backup",
+    "name": "Prime Backup Notify",
     "description": {
-        "en_us": "A powerful backup plugin for MCDR, an advanced backup solution for your Minecraft world",
-        "zh_cn": "一个强大的MCDR备份插件，一套先进的Minecraft存档备份解决方案"
+        "en_us": "A powerful backup plugin for MCDR with task notification support. Modified from Prime Backup by Fallen_Breath",
+        "zh_cn": "一个强大的MCDR备份插件，支持任务通知推送。基于 Fallen_Breath 的 Prime Backup 修改"
     },
     "author": [
-        "Fallen_Breath"
+        "Fallen_Breath (original)",
+        "colorcard"
     ],
-    "link": "https://github.com/TISUnion/PrimeBackup",
+    "link": "https://github.com/colorcard/PrimeBackupNotify",
     "dependencies": {
         "mcdreforged": ">=2.12.0"
     },
     "entrypoint": "prime_backup.mcdr.mcdr_entrypoint",
-    "archive_name": "PrimeBackup-v{version}.pyz",
+    "archive_name": "PrimeBackupNotify-v{version}.pyz",
     "resources": [
         "lang",
         "__main__.py",

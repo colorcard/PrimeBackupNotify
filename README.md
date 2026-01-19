@@ -1,12 +1,27 @@
-# Prime Backup
+# Prime Backup Notify
 
 **English** | [中文](README.zh.md)
 
 A powerful backup plugin for MCDR, an advanced backup solution for your Minecraft world
 
+**Modified from original [Prime Backup](https://github.com/TISUnion/PrimeBackup) with task notification features**
+
+Original Author: [Fallen_Breath](https://github.com/Fallen-Breath)  
+Modified By: [colorcard](https://github.com/colorcard)  
+License: LGPL v3
+
 Document: https://tisunion.github.io/PrimeBackup/
 
-## Features
+## New Features (Compared to Original Prime Backup)
+
+- **Task Notifications**: Push notifications when backup/restore tasks start, succeed, or fail
+- **Webhook Support**: Configure multiple webhook endpoints with JSON payload
+- **Native Bark Support**: Direct push to Bark without relay webhook (supports URL placeholders, custom levels and message formatting)
+- **Ops-Friendly**: Bark messages include key fields (backup ID, cost, errors) by default, with automatic severity level mapping
+- **Command-line Testing**: New `!!pb test notify` command for quick notification testing
+- **Complete Documentation**: Bilingual (EN/ZH) notification docs and config examples
+
+## Original Features
 
 - Only stores files with changes with the hash-based file pool. Supports unlimited number of backup
 - Comprehensive backup operations, including backup/restore, list/delete, import/export, etc

@@ -1,11 +1,11 @@
 # https://www.mkdocs.org/
-site_name: Prime Backup Documentation
-site_url: https://tisunion.github.io/PrimeBackup/
-site_author: Fallen_Breath
-site_description: A powerful backup plugin for MCDR, an advanced backup solution for your Minecraft world
-repo_url: https://github.com/TISUnion/PrimeBackup
-repo_name: TISUnion/PrimeBackup
-copyright: Copyright &copy; 2025 Fallen_Breath
+site_name: Prime Backup Notify Documentation
+site_url: https://colorcard.github.io/PrimeBackupNotify/
+site_author: colorcard (Original: Fallen_Breath)
+site_description: A powerful backup plugin for MCDR with task notification support
+repo_url: https://github.com/colorcard/PrimeBackupNotify
+repo_name: colorcard/PrimeBackupNotify
+copyright: Copyright &copy; 2025 Fallen_Breath (Original), colorcard
 exclude_docs: |-
   /requirements.txt
 
@@ -76,7 +76,7 @@ plugins:
           name: 简体中文
           build: true
           # translations:
-          site_name: Prime Backup 文档
+          site_name: Prime Backup Notify 文档
           nav_translations:
             Features: 功能列表
             Concepts: 概念列表

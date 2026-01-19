@@ -1,12 +1,27 @@
-# Prime Backup
+# Prime Backup Notify
 
 [English](README.md) | **中文**
 
 一个强大的 MCDR 备份插件，一套先进的 Minecraft 存档备份解决方案
 
+**基于原版 [Prime Backup](https://github.com/TISUnion/PrimeBackup) 修改，新增任务通知推送功能**
+
+原作者：[Fallen_Breath](https://github.com/Fallen-Breath)  
+修改者：[colorcard](https://github.com/colorcard)  
+许可证：LGPL v3
+
 中文文档：https://tisunion.github.io/PrimeBackup/zh/
 
-## Features
+## 新增功能（相较于原版 Prime Backup）
+
+- **任务通知推送**：支持在备份/回档任务开始、成功、失败时推送通知
+- **Webhook 支持**：可配置多个 Webhook 端点，发送 JSON 格式通知
+- **Bark 原生支持**：无需中转 webhook，直接推送到 Bark（支持 URL 占位符、自定义等级与消息格式）
+- **运维友好**：Bark 消息默认包含关键字段（备份ID、耗时、错误等），支持根据任务结果自动设置通知等级
+- **命令行测试**：新增 `!!pb test notify` 命令，可在服务器内快速测试通知配置
+- **完整文档**：提供中英文通知功能文档与配置说明
+
+## 原版功能
 
 - 基于哈希的文件池，只储存有变化的文件。支持无限数量的备份
 - 完善的备份操作，包括备份回档、展示删除、导入导出等

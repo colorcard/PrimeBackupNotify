@@ -126,7 +126,7 @@ def _make_payload(
 	if extra is not None:
 		payload['extra'] = extra
 
-	title = f'PrimeBackup {event.task} {event.status}'
+	title = f'Prime Backup Notify {event.task} {event.status}'
 	body_parts = [f'event={event.value}']
 	if backup is not None:
 		body_parts.append(f'backup=#{backup.id}')
