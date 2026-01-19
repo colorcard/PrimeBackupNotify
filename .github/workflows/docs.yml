@@ -3,7 +3,7 @@ name: Build docs page
 on:
   push:
     branches:
-      - master
+      - notify-dev
 permissions:
   contents: write
 jobs:
