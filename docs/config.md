@@ -810,7 +810,9 @@ Notification endpoint list. Each endpoint receives a notification on selected ev
 - `type`: `webhook` or `bark` (`str`, default `"webhook"`)
 - `url`: target URL (`str`)
 - `headers`: extra request headers (`Dict[str, str]`, default `{}`)
-- `timeout`: request timeout ([`Duration`](#duration), default `"5s"`)
+- `timeout`: request timeout ([`Duration`](#duration), default `"5s"`, range 1-60s)
+- `retry_times`: number of retries on failure (`int`, default `1`, range 0-3)
+  - Retries use exponential backoff strategy (1s, 2s, 4s)
 - `bark`: Bark options (see below)
 
 ###### Bark options

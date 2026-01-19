@@ -102,6 +102,50 @@ class NotifyUtilsTestCase(unittest.TestCase):
 			endpoint.on_deserialization()
 		self.assertIn('too long', str(cm.exception))
 
+	def test_endpoint_retry_validation(self):
+		"""Test that retry_times validation works"""
+		# Negative retry
+		with self.assertRaises(ValueError) as cm:
+			endpoint = NotificationEndpoint(url='http://example.com', retry_times=-1)
+			endpoint.on_deserialization()
+		self.assertIn('negative', str(cm.exception))
+		
+		# Too many retries
+		with self.assertRaises(ValueError) as cm:
+			endpoint = NotificationEndpoint(url='http://example.com', retry_times=10)
+			endpoint.on_deserialization()
+		self.assertIn('too large', str(cm.exception))
+
+	def test_notification_errors(self):
+		"""Test that custom exception types are raised correctly"""
+		from prime_backup.utils.notify_utils import NetworkError, DataError
+		
+		# Test NetworkError on bad URL
+		with self.assertRaises(NetworkError):
+			notify_utils._post_json('http://invalid-url-that-does-not-exist-12345.com', {}, {}, 1)
+		
+		# Test DataError on non-serializable data (would be caught earlier in practice)
+		# This is more of a demonstration of the error types
+
+	def test_retry_mechanism(self):
+		"""Test that retry mechanism works with exponential backoff"""
+		call_count = 0
+		
+		def mock_post_fail(*args, **kwargs):
+			nonlocal call_count
+			call_count += 1
+			raise notify_utils.NetworkError('Simulated failure')
+		
+		with patch('prime_backup.utils.notify_utils._post_json', side_effect=mock_post_fail):
+			success, error = notify_utils._post_json_with_retry(
+				'http://example.com', {}, {}, 1.0, retry_times=2
+			)
+			
+			# Should have tried 3 times total (initial + 2 retries)
+			self.assertEqual(call_count, 3)
+			self.assertFalse(success)
+			self.assertIsNotNone(error)
+
 	def test_notify_with_results(self):
 		"""Test notify_with_results returns proper result tuples"""
 		from prime_backup.config.config import Config, set_config_instance

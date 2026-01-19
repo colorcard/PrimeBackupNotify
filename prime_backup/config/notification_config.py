@@ -37,6 +37,7 @@ class NotificationEndpoint(Serializable):
 	url: str = ''
 	headers: Dict[str, str] = {}
 	timeout: Duration = Duration('5s')
+	retry_times: int = 1  # Number of retries on failure (0-3)
 	bark: BarkOptions = BarkOptions()
 
 	@override
@@ -54,6 +55,12 @@ class NotificationEndpoint(Serializable):
 			raise ValueError('notification endpoint {!r} timeout is too short: {}s (min 1s)'.format(self.name, self.timeout.value))
 		if self.timeout.value > 60:
 			raise ValueError('notification endpoint {!r} timeout is too long: {}s (max 60s)'.format(self.name, self.timeout.value))
+		
+		# Validate retry_times range (0-3)
+		if self.retry_times < 0:
+			raise ValueError('notification endpoint {!r} retry_times is negative: {}'.format(self.name, self.retry_times))
+		if self.retry_times > 3:
+			raise ValueError('notification endpoint {!r} retry_times is too large: {} (max 3)'.format(self.name, self.retry_times))
 		
 		# Warn if using Authorization header without HTTPS
 		if 'Authorization' in self.headers and self.url.startswith('http://') and not self.url.startswith('http://localhost') and not self.url.startswith('http://127.'):

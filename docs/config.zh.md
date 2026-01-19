@@ -812,7 +812,9 @@ Prime Backup 所使用的 SQLite 数据库的相关配置
 - `type`：Endpoint 类型，`webhook` 或 `bark`（`str`，默认 `"webhook"`）
 - `url`：目标地址（`str`）
 - `headers`：额外请求头（`Dict[str, str]`，默认 `{}`）
-- `timeout`：请求超时（[`Duration`](#duration)，默认 `"5s"`）
+- `timeout`：请求超时（[`Duration`](#duration)，默认 `"5s"`，范围 1-60 秒）
+- `retry_times`：失败后重试次数（`int`，默认 `1`，范围 0-3）
+  - 重试采用指数退避策略（1s, 2s, 4s）
 - `bark`：Bark 专用参数（见下）
 
 ###### Bark 参数

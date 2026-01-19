@@ -2,7 +2,9 @@ import datetime
 import json
 import time
 import urllib.request
-from typing import Optional, Any, Dict
+import urllib.error
+from typing import Optional, Any, Dict, Tuple, List
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from prime_backup import constants
 from prime_backup import logger
@@ -10,6 +12,26 @@ from prime_backup.config.config import Config
 from prime_backup.types.backup_info import BackupInfo
 from prime_backup.types.notification_event import NotificationEvent
 from prime_backup.types.operator import Operator
+
+
+class NotificationError(Exception):
+	"""Base exception for notification errors"""
+	pass
+
+
+class NetworkError(NotificationError):
+	"""Network-related errors (timeout, connection refused, etc.)"""
+	pass
+
+
+class ConfigError(NotificationError):
+	"""Configuration errors (invalid URL, missing fields, etc.)"""
+	pass
+
+
+class DataError(NotificationError):
+	"""Data serialization errors"""
+	pass
 
 
 def _get_plugin_version() -> str:
@@ -139,15 +161,52 @@ def _make_payload(
 
 
 def _post_json(url: str, payload: Dict[str, Any], headers: Dict[str, str], timeout_s: float):
-	data = json.dumps(payload, ensure_ascii=False).encode('utf8')
+	"""Post JSON data to URL with proper error handling"""
+	try:
+		data = json.dumps(payload, ensure_ascii=False).encode('utf8')
+	except (TypeError, ValueError) as e:
+		raise DataError(f'Failed to serialize payload: {e}') from e
+	
 	request_headers = {
 		'Content-Type': 'application/json',
 		'User-Agent': f'{constants.PLUGIN_ID}/{_get_plugin_version()}',
 	}
 	request_headers.update(headers)
-	request = urllib.request.Request(url, data=data, headers=request_headers, method='POST')
-	with urllib.request.urlopen(request, timeout=timeout_s) as response:
-		response.read()
+	
+	try:
+		request = urllib.request.Request(url, data=data, headers=request_headers, method='POST')
+		with urllib.request.urlopen(request, timeout=timeout_s) as response:
+			response.read()
+	except urllib.error.HTTPError as e:
+		raise NetworkError(f'HTTP {e.code}: {e.reason}') from e
+	except urllib.error.URLError as e:
+		raise NetworkError(f'URL error: {e.reason}') from e
+	except TimeoutError as e:
+		raise NetworkError(f'Timeout after {timeout_s}s') from e
+	except Exception as e:
+		raise NetworkError(f'Request failed: {e}') from e
+
+
+def _post_json_with_retry(url: str, payload: Dict[str, Any], headers: Dict[str, str], timeout_s: float, retry_times: int) -> Tuple[bool, Optional[str]]:
+	"""Post JSON with exponential backoff retry
+	
+	Returns:
+		(success, error_message)
+	"""
+	last_error = None
+	for attempt in range(retry_times + 1):
+		try:
+			_post_json(url, payload, headers, timeout_s)
+			return True, None
+		except NotificationError as e:
+			last_error = str(e)
+			if attempt < retry_times:
+				# Exponential backoff: 1s, 2s, 4s
+				delay = 2 ** attempt
+				time.sleep(delay)
+			continue
+	
+	return False, last_error
 
 
 def _apply_if_not_none(data: Dict[str, Any], key: str, value: Any):
@@ -257,6 +316,51 @@ def _make_bark_payload(base_payload: Dict[str, Any], endpoint) -> Dict[str, Any]
 	return data
 
 
+def _send_to_endpoint(endpoint, payload: Dict[str, Any]) -> Tuple[str, bool, Optional[str], float]:
+	"""Send notification to a single endpoint with retry
+	
+	Returns:
+		(endpoint_name, success, error_message, duration_seconds)
+	"""
+	log = logger.get()
+	start_time = time.time()
+	
+	if not endpoint.enabled:
+		return (endpoint.name, False, 'Endpoint disabled', 0.0)
+	
+	if len(endpoint.url) == 0:
+		log.warning('Notification endpoint {} has empty url, skipped'.format(endpoint.name))
+		return (endpoint.name, False, 'Empty URL', 0.0)
+	
+	try:
+		if endpoint.type == 'bark':
+			bark_url = _resolve_bark_url(endpoint)
+			bark_payload = _make_bark_payload(payload, endpoint)
+			success, error_msg = _post_json_with_retry(
+				bark_url, bark_payload, endpoint.headers, 
+				endpoint.timeout.value, endpoint.retry_times
+			)
+		else:
+			success, error_msg = _post_json_with_retry(
+				endpoint.url, payload, endpoint.headers,
+				endpoint.timeout.value, endpoint.retry_times
+			)
+		
+		duration = time.time() - start_time
+		if success:
+			log.debug('Notification sent to {} in {:.2f}s'.format(endpoint.name, duration))
+		else:
+			log.warning('Failed to send notification to {} after retries: {}'.format(endpoint.name, error_msg))
+		
+		return (endpoint.name, success, error_msg, duration)
+	
+	except Exception as e:
+		duration = time.time() - start_time
+		error_msg = f'Unexpected error: {e}'
+		log.error('Notification to {} failed with exception: {}'.format(endpoint.name, e))
+		return (endpoint.name, False, error_msg, duration)
+
+
 def notify(
 		event: NotificationEvent, *,
 		backup: Optional[BackupInfo] = None,
@@ -280,14 +384,12 @@ def notify_with_results(
 		message: Optional[str] = None,
 		error: Optional[Exception] = None,
 		extra: Optional[Dict[str, Any]] = None,
-):
-	"""Send notifications and return detailed results for each endpoint
+) -> List[Tuple[str, bool, Optional[str], float]]:
+	"""Send notifications and return detailed results for each endpoint (with concurrency)
 	
 	Returns:
 		List of tuples: (endpoint_name, success, error_message, duration_seconds)
 	"""
-	import time
-	
 	config = Config.get().notification
 	results = []
 	
@@ -309,32 +411,29 @@ def notify_with_results(
 		extra=extra,
 	)
 
-	log = logger.get()
-	for endpoint in config.endpoints:
-		if not endpoint.enabled:
-			continue
-		if len(endpoint.url) == 0:
-			log.warning('Notification endpoint {} has empty url, skipped'.format(endpoint.name))
-			results.append((endpoint.name, False, 'Empty URL', 0.0))
-			continue
+	# Send notifications concurrently to all enabled endpoints
+	enabled_endpoints = [ep for ep in config.endpoints if ep.enabled]
+	
+	if len(enabled_endpoints) == 0:
+		return results
+	
+	# Use ThreadPoolExecutor for concurrent sending
+	max_workers = min(len(enabled_endpoints), 5)  # Limit to 5 concurrent requests
+	with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='notify') as executor:
+		# Submit all tasks
+		future_to_endpoint = {
+			executor.submit(_send_to_endpoint, endpoint, payload): endpoint
+			for endpoint in enabled_endpoints
+		}
 		
-		start_time = time.time()
-		try:
-			if endpoint.type == 'bark':
-				bark_url = _resolve_bark_url(endpoint)
-				bark_payload = _make_bark_payload(payload, endpoint)
-				_post_json(bark_url, bark_payload, endpoint.headers, endpoint.timeout.value)
-			else:
-				_post_json(endpoint.url, payload, endpoint.headers, endpoint.timeout.value)
-			
-			duration = time.time() - start_time
-			log.debug('Notification sent to {} for event {} in {:.2f}s'.format(endpoint.name, event.value, duration))
-			results.append((endpoint.name, True, None, duration))
-		except Exception as e:
-			duration = time.time() - start_time
-			error_msg = str(e)
-			log.warning('Failed to send notification to {} after {:.2f}s: {}'.format(endpoint.name, duration, error_msg))
-			results.append((endpoint.name, False, error_msg, duration))
+		# Collect results as they complete
+		for future in as_completed(future_to_endpoint):
+			try:
+				result = future.result()
+				results.append(result)
+			except Exception as e:
+				endpoint = future_to_endpoint[future]
+				logger.get().error('Unexpected error processing notification for {}: {}'.format(endpoint.name, e))
+				results.append((endpoint.name, False, f'Processing error: {e}', 0.0))
 	
 	return results
-
