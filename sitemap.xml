@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/cli/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/cli/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/cli/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/command/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/command/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/command/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/config/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/config/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/config/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/quick_start/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/quick_start/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/quick_start/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/concept/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/concept/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/concept/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/concept/backup_tag/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/concept/backup_tag/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/concept/backup_tag/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/concept/storage_structure/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/concept/storage_structure/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/concept/storage_structure/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/backup_create/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_create/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_create/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/backup_display/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_display/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_display/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/backup_edit/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_edit/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_edit/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/backup_import/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_import/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_import/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/backup_restore/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_restore/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_restore/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/database_inspect/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_inspect/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_inspect/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/database_maintain/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_maintain/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_maintain/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/database_operation/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_operation/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_operation/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/database_overview/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_overview/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_overview/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/feature/notification/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/notification/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/notification/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/cli/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/cli/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/cli/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/command/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/command/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/command/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/config/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/config/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/config/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/quick_start/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/quick_start/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/quick_start/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/concept/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/concept/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/concept/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/concept/backup_tag/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/concept/backup_tag/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/concept/backup_tag/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/concept/storage_structure/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/concept/storage_structure/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/concept/storage_structure/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_create/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_create/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_create/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_display/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_display/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_display/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_edit/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_edit/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_edit/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_import/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_import/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_import/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_restore/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/backup_restore/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/backup_restore/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_inspect/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_inspect/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_inspect/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_maintain/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_maintain/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_maintain/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_operation/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_operation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_operation/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_overview/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/database_overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/database_overview/"/>
+    </url>
+    <url>
+        <loc>https://colorcard.github.io/PrimeBackupNotify/zh/feature/notification/</loc>
+        <lastmod>2026-01-19</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://colorcard.github.io/PrimeBackupNotify/zh/feature/notification/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://colorcard.github.io/PrimeBackupNotify/feature/notification/"/>
+    </url>
+</urlset>
