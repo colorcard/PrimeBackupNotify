@@ -10,7 +10,7 @@ Original Author: [Fallen_Breath](https://github.com/Fallen-Breath)
 Modified By: [colorcard](https://github.com/colorcard)  
 License: LGPL v3
 
-Document: https://tisunion.github.io/PrimeBackup/
+Document: https://colorcard.github.io/PrimeBackupNotify/
 
 ## New Features (Compared to Original Prime Backup)
 
@@ -40,7 +40,7 @@ Python package requirements: See [requirements.txt](requirements.txt)
 
 ## Usages
 
-See the document: https://tisunion.github.io/PrimeBackup/
+See the document: https://colorcard.github.io/PrimeBackupNotify/
 
 ## How it works
 

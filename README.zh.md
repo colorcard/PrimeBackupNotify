@@ -10,7 +10,7 @@
 修改者：[colorcard](https://github.com/colorcard)  
 许可证：LGPL v3
 
-中文文档：https://tisunion.github.io/PrimeBackup/zh/
+中文文档：https://colorcard.github.io/PrimeBackupNotify/zh/
 
 ## 新增功能（相较于原版 Prime Backup）
 
@@ -40,7 +40,7 @@ Python 包要求：见 [requirements.txt](requirements.txt)
 
 ## 使用方法
 
-参见文档：https://tisunion.github.io/PrimeBackup/zh/
+参见文档：https://colorcard.github.io/PrimeBackupNotify/zh/
 
 ## 工作原理
 

@@ -1,8 +1,8 @@
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
-from prime_backup.config.notification_config import NotificationEndpoint, BarkOptions
+from prime_backup.config.notification_config import NotificationEndpoint, BarkOptions, NotificationConfig
 from prime_backup.types.notification_event import NotificationEvent
 from prime_backup.utils import notify_utils
 
@@ -35,7 +35,7 @@ class NotifyUtilsTestCase(unittest.TestCase):
 			bark=BarkOptions(device_key='abc', group='pb', markdown=True),
 		)
 		base_payload = {
-			'title': 'PrimeBackup backup success',
+			'title': 'Prime Backup Notify backup success',
 			'body': 'event=backup_success, backup=#1',
 			'event': 'backup_success',
 			'status': 'success',
@@ -67,7 +67,7 @@ class NotifyUtilsTestCase(unittest.TestCase):
 	def test_bark_level_default_failure(self):
 		endpoint = NotificationEndpoint(type='bark', url='https://api.day.app/{device_key}', bark=BarkOptions(device_key='xyz'))
 		base_payload = {
-			'title': 'PrimeBackup backup failure',
+			'title': 'Prime Backup Notify backup failure',
 			'event': 'backup_failure',
 			'status': 'failure',
 			'task': 'backup',
@@ -79,6 +79,63 @@ class NotifyUtilsTestCase(unittest.TestCase):
 		bark_payload = notify_utils._make_bark_payload(base_payload, endpoint)
 		self.assertEqual('critical', bark_payload['level'])
 
+	def test_endpoint_url_validation(self):
+		"""Test that empty URL raises error when endpoint is enabled"""
+		with self.assertRaises(ValueError) as cm:
+			endpoint = NotificationEndpoint(enabled=True, name='test', url='')
+			endpoint.on_deserialization()
+		self.assertIn('URL is empty', str(cm.exception))
+
+	def test_endpoint_timeout_validation(self):
+		"""Test that timeout validation works"""
+		from prime_backup.types.units import Duration
+		
+		# Too short
+		with self.assertRaises(ValueError) as cm:
+			endpoint = NotificationEndpoint(url='http://example.com', timeout=Duration('0.5s'))
+			endpoint.on_deserialization()
+		self.assertIn('too short', str(cm.exception))
+		
+		# Too long
+		with self.assertRaises(ValueError) as cm:
+			endpoint = NotificationEndpoint(url='http://example.com', timeout=Duration('120s'))
+			endpoint.on_deserialization()
+		self.assertIn('too long', str(cm.exception))
+
+	def test_notify_with_results(self):
+		"""Test notify_with_results returns proper result tuples"""
+		from prime_backup.config.config import Config, set_config_instance
+		
+		# Create mock config
+		config = Config()
+		config.notification = NotificationConfig(
+			enabled=True,
+			events=[NotificationEvent.backup_success],
+			endpoints=[
+				NotificationEndpoint(
+					enabled=True,
+					name='test_endpoint',
+					type='webhook',
+					url='http://example.com/webhook'
+				)
+			]
+		)
+		set_config_instance(config)
+		
+		# Mock HTTP request
+		with patch('prime_backup.utils.notify_utils._post_json') as mock_post:
+			mock_post.return_value = None
+			
+			results = notify_utils.notify_with_results(NotificationEvent.backup_success)
+			
+			self.assertEqual(len(results), 1)
+			endpoint_name, success, error_msg, duration = results[0]
+			self.assertEqual(endpoint_name, 'test_endpoint')
+			self.assertTrue(success)
+			self.assertIsNone(error_msg)
+			self.assertGreaterEqual(duration, 0)
+
 
 if __name__ == '__main__':
 	unittest.main()
+

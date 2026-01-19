@@ -262,14 +262,33 @@ class CommandManager:
 		if not config.enabled or len(config.endpoints) == 0:
 			reply_message(source, tr('command.test_notify.disabled').set_color(RColor.yellow))
 			return
+		
 		event = context.get('event', NotificationEvent.backup_success)
-		notify_utils.notify(
+		
+		# Send notification with detailed result tracking
+		import time
+		start_time = time.time()
+		results = notify_utils.notify_with_results(
 			event,
 			operator=Operator.of(source),
 			source=source,
 			message='manual_test',
 		)
-		reply_message(source, tr('command.test_notify.sent', event.value))
+		elapsed = time.time() - start_time
+		
+		# Display results
+		reply_message(source, tr('command.test_notify.sending', event.value))
+		
+		for endpoint_name, success, error_msg, duration in results:
+			if success:
+				msg = tr('command.test_notify.endpoint_success', endpoint_name, f'{duration:.2f}s')
+				reply_message(source, msg.set_color(RColor.green))
+			else:
+				msg = tr('command.test_notify.endpoint_failed', endpoint_name, error_msg)
+				reply_message(source, msg.set_color(RColor.red))
+		
+		summary = tr('command.test_notify.summary', len([r for r in results if r[1]]), len(results), f'{elapsed:.2f}s')
+		reply_message(source, summary.set_color(RColor.gray))
 
 	def cmd_show_backup_tag(self, source: CommandSource, context: CommandContext, tag_name: Optional[BackupTagName] = None):
 		def backup_id_consumer(backup_id: int):

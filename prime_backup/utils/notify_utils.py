@@ -267,13 +267,36 @@ def notify(
 		error: Optional[Exception] = None,
 		extra: Optional[Dict[str, Any]] = None,
 ):
+	"""Send notifications without tracking results (fire and forget)"""
+	_ = notify_with_results(event, backup=backup, operator=operator, source=source, cost_s=cost_s, message=message, error=error, extra=extra)
+
+
+def notify_with_results(
+		event: NotificationEvent, *,
+		backup: Optional[BackupInfo] = None,
+		operator: Optional[Operator] = None,
+		source: Optional[Any] = None,
+		cost_s: Optional[float] = None,
+		message: Optional[str] = None,
+		error: Optional[Exception] = None,
+		extra: Optional[Dict[str, Any]] = None,
+):
+	"""Send notifications and return detailed results for each endpoint
+	
+	Returns:
+		List of tuples: (endpoint_name, success, error_message, duration_seconds)
+	"""
+	import time
+	
 	config = Config.get().notification
+	results = []
+	
 	if not config.enabled:
-		return
+		return results
 	if event not in config.events:
-		return
+		return results
 	if len(config.endpoints) == 0:
-		return
+		return results
 
 	payload = _make_payload(
 		event,
@@ -292,7 +315,10 @@ def notify(
 			continue
 		if len(endpoint.url) == 0:
 			log.warning('Notification endpoint {} has empty url, skipped'.format(endpoint.name))
+			results.append((endpoint.name, False, 'Empty URL', 0.0))
 			continue
+		
+		start_time = time.time()
 		try:
 			if endpoint.type == 'bark':
 				bark_url = _resolve_bark_url(endpoint)
@@ -300,6 +326,15 @@ def notify(
 				_post_json(bark_url, bark_payload, endpoint.headers, endpoint.timeout.value)
 			else:
 				_post_json(endpoint.url, payload, endpoint.headers, endpoint.timeout.value)
-			log.debug('Notification sent to {} for event {}'.format(endpoint.name, event.value))
+			
+			duration = time.time() - start_time
+			log.debug('Notification sent to {} for event {} in {:.2f}s'.format(endpoint.name, event.value, duration))
+			results.append((endpoint.name, True, None, duration))
 		except Exception as e:
-			log.warning('Failed to send notification to {}: {}'.format(endpoint.name, e))
+			duration = time.time() - start_time
+			error_msg = str(e)
+			log.warning('Failed to send notification to {} after {:.2f}s: {}'.format(endpoint.name, duration, error_msg))
+			results.append((endpoint.name, False, error_msg, duration))
+	
+	return results
+

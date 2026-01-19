@@ -17,7 +17,10 @@ prime_backup:
       not_abort_able: The current task {} is not abort-able
     test_notify:
       disabled: Notification is disabled or no endpoint configured
-      sent: Test notification sent (event: {})
+      sending: 'Sending test notification (event: {})...'
+      endpoint_success: '✓ {} - Success (took: {})'
+      endpoint_failed: '✗ {} - Failed: {}'
+      summary: 'Summary: {}/{} endpoints succeeded, total time: {}'
 
   task:
     _base:

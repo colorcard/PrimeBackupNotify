@@ -17,7 +17,10 @@ prime_backup:
       not_abort_able: 当前任务{}无法被终止
     test_notify:
       disabled: 通知未启用或未配置推送地址
-      sent: 已发送测试通知（事件：{}）
+      sending: 正在发送测试通知（事件：{}）...
+      endpoint_success: '✓ {} - 成功 (耗时: {})'
+      endpoint_failed: '✗ {} - 失败: {}'
+      summary: '总计: {}/{} 个端点成功, 总耗时: {}'
 
   task:
     _base:

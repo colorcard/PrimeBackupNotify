@@ -44,6 +44,21 @@ class NotificationEndpoint(Serializable):
 		self.type = str(self.type).lower()
 		if self.type not in ['webhook', 'bark']:
 			raise ValueError('bad notification endpoint type {!r}'.format(self.type))
+		
+		# Validate URL is not empty when endpoint is enabled
+		if self.enabled and not self.url:
+			raise ValueError('notification endpoint {!r} is enabled but URL is empty'.format(self.name))
+		
+		# Validate timeout range (1s to 60s)
+		if self.timeout.value < 1:
+			raise ValueError('notification endpoint {!r} timeout is too short: {}s (min 1s)'.format(self.name, self.timeout.value))
+		if self.timeout.value > 60:
+			raise ValueError('notification endpoint {!r} timeout is too long: {}s (max 60s)'.format(self.name, self.timeout.value))
+		
+		# Warn if using Authorization header without HTTPS
+		if 'Authorization' in self.headers and self.url.startswith('http://') and not self.url.startswith('http://localhost') and not self.url.startswith('http://127.'):
+			import warnings
+			warnings.warn('notification endpoint {!r} uses Authorization header with non-HTTPS URL, credentials may be exposed'.format(self.name))
 
 
 class NotificationConfig(Serializable):
